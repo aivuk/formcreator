@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block main %}
+
+<form method="POST">
+<table>
+{% for field in form %}
+    <tr>
+        <th>{{ field.label }}</th>
+        <td>{{ field }}</td>
+        <td>{{field.description}}</td>
+    </tr>
+{% endfor %}
+</table>
+</form>
+
+{% endblock %}
