@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, make_response, render_template, flash
 import wtforms
 from functools import partial
 import subprocess as sp
+import os
 
 SCRIPT_URL = '/'
 SCRIPT_PATH = '.'
@@ -34,13 +35,13 @@ class MainApp(object):
 
 class wCmd(object):
 
-    def __init__(self, command, command_name, command_description):
+    def __init__(self, command, name='', desc=''):
         self.form = wtforms.form.BaseForm(())
         self.command = command
-        self.name = command_name
-        self.command_description = command_description
+        self.name = name if name else command
+        self.desc = desc
 
-    def add(self, name, label='', info=u'', cmd_opt=None,  field_type=wtforms.TextField, default=None):
+    def add(self, name, label='', info=u'', cmd_opt=None,  default=None, field_type=wtforms.TextField):
         if name in self.form:
             print "Field name already exist"
             raise
@@ -66,7 +67,12 @@ class wCmd(object):
             if hasattr(field, 'cmd_opt'):
                 cmd_parts += [field.cmd_opt, field.data]
             else:
-                cmd_parts += [field.data]
+                if field.name == 'file':
+                    file = request.files[field.name]
+                    file.save(os.path.join('.', file.filename))
+                    cmd_parts += [file.filename]
+                else:
+                    cmd_parts += [field.data]
 
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
