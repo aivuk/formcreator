@@ -39,7 +39,6 @@
 
 <body>
 
-
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             {% for message in messages %}
@@ -51,7 +50,6 @@
           {% endif %}
         {% endwith %}
 
-
     <div class="navbar navbar-fixed-top"> 
       <div class="navbar-inner"> 
         <div class="container"> 
@@ -60,14 +58,12 @@
             <span class="icon-bar"></span> 
             <span class="icon-bar"></span> 
           </a> 
-          <a class="brand" href="#">appname</a> 
+          <a class="brand" href="#"> {{ app.name }} </a> 
           <div class="nav-collapse"> 
             <ul class="nav"> 
-              <li class="active"><a href="/">Home</a></li> 
-              <li><a href="#about">About</a></li> 
-              <li><a href="#contact">Contact</a></li>
-              <li><a href="/login/">Login</a></li>
-              <li><a href="/users/create/">Signup</a></li>                
+                {% for cmd in app.cmds %} 
+                <li class="active"><a href="#">{{ cmd.command_name }}</a></li> 
+                {% endfor %}
             </ul> 
           </div><!--/.nav-collapse --> 
         </div> 

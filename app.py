@@ -9,11 +9,19 @@ SCRIPT_PATH = '.'
 app = Flask(__name__)
 app.config.from_pyfile('app.cfg')
 
+class MainApp(object):
+
+  def __init__(self, name, cmds):
+        self.name = name
+        self.cmds = cmds
+
 class wCmd(object):
 
-    def __init__(self, command):
+    def __init__(self, command, command_name, command_description):
         self.form = wtforms.form.BaseForm(())
         self.command = command
+        self.command_name = command_name
+        self.command_description = command_description
 
     def add(self, name, cmd_opt, label, info=u'', field_type=wtforms.TextField, default=None):
         if name in self.form:
@@ -31,35 +39,38 @@ class wCmd(object):
         fs.sort(key = lambda x: x.position)
         return fs
 
-    def run(self):
-        sp.Popen(self.command)
+    def process(self, form_data):
+        self.form.process(form_data)
 
-webCmd = wCmd("ls")
+    def run(self):
+        cmd_parts = [self.command]
+        for field in self.form:
+            cmd_parts += [field.cmd_opt, field.data]
+
+        self.stdout = sp.Popen(cmd_parts, stdout=sp.PIPE).communicate()[0].decode('utf8')
+
+webCmd = wCmd("ls", "ls -l", "List file info")
 webCmd.add( 'ls_attr'
           , '-l'
           , u'Filename'
-          , u'Name of file to show attributes')
+          , u'Name of file/directory to run ls -l')
 
-# webCmd.add( 'arg_num2'
-#           , '-f'
-#           , u'Número de parâmetros'
-#           , u'Número entre 0 e 30')
+test_app = MainApp('Testing', [webCmd])
 
 def form():
     f = webCmd
 
     if request.method == 'POST':
-       f.form.process(request.form)
-       o = [f.command]
-       for field in f.form:
-           o += [field.cmd_opt, field.data]
-
-       output = sp.Popen(o, stdout=sp.PIPE).communicate()[0]
-       return render_template('form.html', output=output)
+       f.process(request.form)
+       f.run()
     else:
-       return render_template('form.html', form=f.list_form())
+       f.stdout = ''
+
+    return render_template('form.html', form=f.list_form(), output=f.stdout, app=test_app)
 
 app.add_url_rule(SCRIPT_URL, 'form', form, methods=['GET', 'POST'])
 
 if __name__ == "__main__":
     app.run(debug=True,host='127.0.0.1')
+
+
