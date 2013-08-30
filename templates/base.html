@@ -61,8 +61,8 @@
           <a class="brand" href="#"> {{ app.name }} </a> 
           <div class="nav-collapse"> 
             <ul class="nav"> 
-                {% for cmd in app.cmds %} 
-                <li class="active"><a href="#">{{ cmd.command_name }}</a></li> 
+                {% for c in app.cmds %} 
+                <li class="active"><a href="#">{{ app.cmds[c].name }}</a></li> 
                 {% endfor %}
             </ul> 
           </div><!--/.nav-collapse --> 
@@ -113,6 +113,6 @@
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
     <![endif]-->
-  
+
 </body>
 </html>
