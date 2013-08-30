@@ -24,6 +24,7 @@ class MainApp(object):
 
     def form(self, cmd_name):
         f = self.cmds[cmd_name]
+        self.active = cmd_name
 
         if request.method == 'POST':
            f.process(request.form)
@@ -33,25 +34,67 @@ class MainApp(object):
 
         return render_template('form.html', form=f.list_form(), output=f.stdout, app=self)
 
+class Opt(object):
+
+    def __init__(self, name, label=u'', description=u'', default='', cmd_opt=None):
+        self.name = name
+        self.default = default
+        if cmd_opt:
+            self.cmd_opt = cmd_opt
+
+class Text(Opt):
+
+    def __init__(self, *args, **kwargs):
+        self.field = wtforms.TextField(args[0], args[1])
+        super(Text, self).__init__(*args, **kwargs)
+
+class File(Opt):
+
+    def __init__(self, *args, **kwargs):
+        self.field = wtforms.FileField(args[0], args[1])
+        super(File, self).__init__(*args, **kwargs)
+
+class Integer(Opt):
+
+    def __init__(self, *args, **kwargs):
+        self.field = wtforms.IntegerField(args[0], args[1])
+        super(File, self).__init__(*args, **kwargs)
+
+class Decimal(Opt):
+
+    def __init__(self, *args, **kwargs):
+        self.field = wtforms.DecimalField(args[0], args[1])
+        super(File, self).__init__(*args, **kwargs)
+
+class Float(Opt):
+
+    def __init__(self, *args, **kwargs):
+        self.field = wtforms.FloatField(args[0], args[1])
+        super(File, self).__init__(*args, **kwargs)
+
+
 class wCmd(object):
 
     def __init__(self, command, name='', desc=''):
         self.form = wtforms.form.BaseForm(())
+        self.opts = []
         self.command = command
         self.name = name if name else command
         self.desc = desc
 
-    def add(self, name, label='', info=u'', cmd_opt=None,  default=None, field_type=wtforms.TextField):
-        if name in self.form:
+    def __add__(self, opt):
+        if opt.name in self.form:
             print "Field name already exist"
             raise
         else:
-            self.form[name] = field_type(label, description=info)
-            new_field = self.form[name]
+            self.form[opt.name] = opt.field
+            new_field = self.form[opt.name]
             new_field.position = len(self.form._fields) + 1
-            new_field.data = default or ''
-            if cmd_opt:
-                new_field.cmd_opt = cmd_opt
+            new_field.data = opt.default or ''
+            if hasattr(opt, "cmd_opt"):
+                new_field.cmd_opt = opt.cmd_opt
+            self.opts.append(opt)
+        return self
 
     def list_form(self):
         fs = list(self.form)

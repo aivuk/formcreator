@@ -50,7 +50,7 @@
           {% endif %}
         {% endwith %}
 
-    <div class="navbar navbar-fixed-top"> 
+    <div class="navbar navbar-inverse navbar-fixed-top"> 
       <div class="navbar-inner"> 
         <div class="container"> 
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> 
@@ -60,9 +60,9 @@
           </a> 
           <a class="brand" href="#"> {{ app.name }} </a> 
           <div class="nav-collapse"> 
-            <ul class="nav"> 
+            <ul class="nav nav-pills"> 
                 {% for c in app.cmds %} 
-                <li class="active"><a href="#">{{ app.cmds[c].name }}</a></li> 
+                <li {% if app.active == app.cmds[c].name %} class="active" {% endif %}><a href="{{ url_for(app.cmds[c].name) }}">{{ app.cmds[c].name }}</a></li> 
                 {% endfor %}
             </ul> 
           </div><!--/.nav-collapse --> 

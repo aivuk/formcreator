@@ -4,19 +4,14 @@
 
 {% block main %}
 
-<form method="POST" enctype="multipart/form-data">
-<table>
+<form class="cmd_form" method="POST" enctype="multipart/form-data">
 {% for field in form %}
-    <tr>
-        <th>{{ field.label }}</th>
-        <td>{{ field }}</td>
-    </tr>
-    <tr>
-        <td colspan="2">{{ field.description}}</td>
-    </tr>
+        {{ field.label }}
+        {{ field }}
+        {{ field.description}}
 {% endfor %}
-</table>
-<input type="submit" name="submit_button" value="Run">
+<p/>
+<input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
 </form>
 
 <pre>
