@@ -27,58 +27,37 @@ class MainApp(object):
     def form(self, cmd_name):
         f = self.cmds[cmd_name]
         self.active = cmd_name
+        f.stdout = ''
 
         if request.method == 'POST':
-           f.process(request.form)
-           f.run()
-        else:
-           f.stdout = ''
+            f.process(request.form)
+            if f.form.validate():
+                f.run()
 
         return render_template('form.html', form=f.list_form(), output=f.stdout, app=self)
 
-class Opt(object):
+def makeOpt(field_type):
+    class Opt(object):
 
-    def __init__(self, name, label='', description='', default='', cmd_opt=None):
-        self.name = name
-        self.default = default
-        if cmd_opt:
-            self.cmd_opt = cmd_opt
+        def __init__(self, name, label='', description='', default='', cmd_opt=None):
+            self.name = name
+            self.default = default
+            self.field = field_type(label=label, description=description)
+            if cmd_opt:
+                self.cmd_opt = cmd_opt
 
-class Text(Opt):
+    return Opt
 
-    def __init__(self, *args, **kwargs):
-        self.field = wtforms.TextField(args[1], args[2])
-        super(Text, self).__init__(*args, **kwargs)
-
-class File(Opt):
-
-    def __init__(self, *args, **kwargs):
-        self.field = wtforms.FileField(args[0], args[1])
-        super(File, self).__init__(*args, **kwargs)
-
-class Integer(Opt):
-
-    def __init__(self, *args, **kwargs):
-        self.field = wtforms.IntegerField(args[1], args[2])
-        super(Integer, self).__init__(*args, **kwargs)
-
-class Decimal(Opt):
-
-    def __init__(self, *args, **kwargs):
-        self.field = wtforms.DecimalField(args[0], args[1])
-        super(Decimal, self).__init__(*args, **kwargs)
-
-class Float(Opt):
-
-    def __init__(self, *args, **kwargs):
-        self.field = wtforms.FloatField(args[0], args[1])
-        super(File, self).__init__(*args, **kwargs)
+Text = makeOpt(wtforms.TextField)
+File = makeOpt(wtforms.FileField)
+Integer = makeOpt(wtforms.IntegerField)
+Float = makeOpt(wtforms.FloatField)
+Decimal = makeOpt(wtforms.DecimalField)
 
 class wCmd(object):
 
     def __init__(self, command, name='', desc=''):
         self.form = wtforms.form.BaseForm(())
-        self.opts = []
         self.command = command
         if str(type(command)) == "<type 'function'>":
             self.cmd_type = "function"
@@ -98,7 +77,6 @@ class wCmd(object):
             new_field.data = opt.default or ''
             if hasattr(opt, "cmd_opt"):
                 new_field.cmd_opt = opt.cmd_opt
-            self.opts.append(opt)
         return self
 
     def list_form(self):
@@ -126,7 +104,6 @@ class wCmd(object):
         self.stdout = cmd[0].decode('utf8')
 
     def run_function(self):
-
         args = []
         kwargs = {}
 
@@ -136,7 +113,6 @@ class wCmd(object):
             else:
                 args.append(field.data)
 
-        print args
         self.stdout = self.command(*args, **kwargs)
 
     def run(self):

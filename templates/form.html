@@ -9,6 +9,9 @@
         {{ field.label }}
         {{ field }}
         {{ field.description}}
+        {% for error in field.errors %}
+            {{ error }}
+        {% endfor %}
 {% endfor %}
 <p/>
 <input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
