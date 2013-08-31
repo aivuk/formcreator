@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 from flask import Flask, request, jsonify, make_response, render_template, flash, redirect, url_for, session, escape, g
 import wtforms
 from functools import partial
@@ -36,7 +38,7 @@ class MainApp(object):
 
 class Opt(object):
 
-    def __init__(self, name, label=u'', description=u'', default='', cmd_opt=None):
+    def __init__(self, name, label='', description='', default='', cmd_opt=None):
         self.name = name
         self.default = default
         if cmd_opt:
@@ -45,7 +47,7 @@ class Opt(object):
 class Text(Opt):
 
     def __init__(self, *args, **kwargs):
-        self.field = wtforms.TextField(args[0], args[1])
+        self.field = wtforms.TextField(args[1], args[2])
         super(Text, self).__init__(*args, **kwargs)
 
 class File(Opt):
@@ -57,14 +59,14 @@ class File(Opt):
 class Integer(Opt):
 
     def __init__(self, *args, **kwargs):
-        self.field = wtforms.IntegerField(args[0], args[1])
-        super(File, self).__init__(*args, **kwargs)
+        self.field = wtforms.IntegerField(args[1], args[2])
+        super(Integer, self).__init__(*args, **kwargs)
 
 class Decimal(Opt):
 
     def __init__(self, *args, **kwargs):
         self.field = wtforms.DecimalField(args[0], args[1])
-        super(File, self).__init__(*args, **kwargs)
+        super(Decimal, self).__init__(*args, **kwargs)
 
 class Float(Opt):
 
@@ -72,19 +74,22 @@ class Float(Opt):
         self.field = wtforms.FloatField(args[0], args[1])
         super(File, self).__init__(*args, **kwargs)
 
-
 class wCmd(object):
 
     def __init__(self, command, name='', desc=''):
         self.form = wtforms.form.BaseForm(())
         self.opts = []
         self.command = command
-        self.name = name if name else command
+        if str(type(command)) == "<type 'function'>":
+            self.cmd_type = "function"
+        else:
+            self.cmd_type = "program"
+        self.name = name
         self.desc = desc
 
     def __add__(self, opt):
         if opt.name in self.form:
-            print "Field name already exist"
+            print ("Field name already exist")
             raise
         else:
             self.form[opt.name] = opt.field
@@ -104,7 +109,7 @@ class wCmd(object):
     def process(self, form_data):
         self.form.process(form_data)
 
-    def run(self):
+    def run_cmd(self):
         cmd_parts = [self.command]
         for field in self.form:
             if hasattr(field, 'cmd_opt'):
@@ -120,4 +125,22 @@ class wCmd(object):
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
 
+    def run_function(self):
 
+        args = []
+        kwargs = {}
+
+        for field in self.form:
+            if hasattr(field, 'cmd_opt'):
+                kwargs[field.cmd_opt] = field.data
+            else:
+                args.append(field.data)
+
+        print args
+        self.stdout = self.command(*args, **kwargs)
+
+    def run(self):
+        if self.cmd_type == 'function':
+            self.run_function()
+        else:
+            self.run_cmd()
