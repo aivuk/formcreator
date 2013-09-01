@@ -1,0 +1,24 @@
+<style>
+    .selected {
+        font-weight: bold;
+    }
+</style>
+<script>
+    function selectFile(filename, li_id) {
+        if ($('input[name="{{field.name}}"]').val() != filename) {
+            $('input[name="{{field.name}}"]').val(filename);
+            $('#select-file-{{field.name}} > li').removeClass('selected');
+            $('#' + li_id).toggleClass('selected');
+        } else {
+            $('input[name="{{field.name}}"]').val('');
+            $('#select-file-{{field.name}} > li').removeClass('selected');
+        }
+    }
+</script>
+<input type="hidden" name={{field.name}} value="">
+<ul id="select-file-{{field.name}}">
+{% for i,file in files %}
+<li id="{{field.name}}-file-{{i}}" onclick="javascript:selectFile('{{file}}', '{{field.name}}-file-{{i}}');">{{ file }}</li>
+{% endfor %}
+</ul>
+

@@ -4,13 +4,14 @@ from formcreator import *
 
 webCmd = wCmd("cat", desc="ls -l", name="ls")
 
-webCmd += File('path'
-              , u'Filename or Path'
+webCmd += File( u'Filename or Path'
               , u'Name of file/directory to run ls -l'
               , upload_directory='updir')
 
-webCmd += Text('path2'
-              , u'Filename or Path'
+webCmd += SelectFile( u'Filename or Path'
+                    , files_directory='updir')
+
+webCmd += Text( u'Filename or Path'
               , u'Name of file/directory to run ls -l')
 
 def duplica(num, exp=1):
@@ -18,12 +19,10 @@ def duplica(num, exp=1):
 
 catCmd =  wCmd(duplica, desc="Show file contents", name="func")
 
-catCmd += Integer(u'numero'
-                 , u'Número'
+catCmd += Integer( u'Número'
                  , u'Número que será multiplicado')
 
-catCmd += Integer(u'exp'
-                 , u'Expoente'
+catCmd += Integer( u'Expoente'
                  , u'Expoente do número'
                  , cmd_opt='exp')
 

@@ -39,7 +39,7 @@ class MainApp(object):
 def makeOpt(field_type, process_formdata=None):
     class Opt(object):
 
-        def __init__(self, name, label='', description='', default='', cmd_opt=None, **kwargs):
+        def __init__(self, label='', description='', name='', default='', cmd_opt=None, **kwargs):
             self.name = name
             self.default = default
             self.field = field_type(label=label, description=description, **kwargs)
@@ -49,6 +49,24 @@ def makeOpt(field_type, process_formdata=None):
                 self.field.process_formdata = process_formdata
 
     return Opt
+
+
+class SelectFileField(wtforms.HiddenField):
+    def __init__(self, *args, **kwargs):
+        self.files_directory = kwargs['files_directory']
+        self.files = os.listdir(self.files_directory)
+        kwargs.pop('files_directory')
+        super(SelectFileField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, data):
+        if data[0] != '':
+            file_path = os.path.join(self.files_directory, data[0])
+            self.data = file_path
+        else:
+            self.data = ''
+
+    def __call__(self):
+        return render_template('select_files.html', field=self, files=enumerate(self.files))
 
 class Upload(wtforms.FileField):
     def __init__(self, *args, **kwargs):
@@ -67,6 +85,7 @@ class Upload(wtforms.FileField):
         else:
             self.data = ''
 
+SelectFile = makeOpt(SelectFileField)
 Text = makeOpt(wtforms.TextField)
 File = makeOpt(Upload)
 Integer = makeOpt(wtforms.IntegerField)
@@ -86,13 +105,15 @@ class wCmd(object):
         self.desc = desc
 
     def __add__(self, opt):
+        field_position = len(self.form._fields) + 1
+        opt.name = 'arg-{}'.format(field_position)
         if opt.name in self.form:
             print ("Field name already exist")
             raise
         else:
             self.form[opt.name] = opt.field
             new_field = self.form[opt.name]
-            new_field.position = len(self.form._fields) + 1
+            new_field.position = field_position
             new_field.data = opt.default or ''
             if hasattr(opt, "cmd_opt"):
                 new_field.cmd_opt = opt.cmd_opt
@@ -112,7 +133,9 @@ class wCmd(object):
             if hasattr(field, 'cmd_opt'):
                 cmd_parts += [field.cmd_opt, field.data]
             else:
-                cmd_parts += [field.data]
+                if field.data:
+                    cmd_parts += [field.data]
+        print cmd_parts
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
 
