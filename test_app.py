@@ -2,12 +2,12 @@
 
 from formcreator import *
 
-webCmd = wCmd("ls", desc="ls -l", name="ls")
+webCmd = wCmd("cat", desc="ls -l", name="ls")
 
-webCmd += Text('path'
+webCmd += File('path'
               , u'Filename or Path'
               , u'Name of file/directory to run ls -l'
-              , cmd_opt='-l')
+              , upload_directory='updir')
 
 webCmd += Text('path2'
               , u'Filename or Path'

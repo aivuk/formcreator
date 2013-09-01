@@ -36,20 +36,41 @@ class MainApp(object):
 
         return render_template('form.html', form=f.list_form(), output=f.stdout, app=self)
 
-def makeOpt(field_type):
+def makeOpt(field_type, process_formdata=None):
     class Opt(object):
 
-        def __init__(self, name, label='', description='', default='', cmd_opt=None):
+        def __init__(self, name, label='', description='', default='', cmd_opt=None, **kwargs):
             self.name = name
             self.default = default
-            self.field = field_type(label=label, description=description)
+            self.field = field_type(label=label, description=description, **kwargs)
             if cmd_opt:
                 self.cmd_opt = cmd_opt
+            if process_formdata:
+                self.field.process_formdata = process_formdata
 
     return Opt
 
 Text = makeOpt(wtforms.TextField)
-File = makeOpt(wtforms.FileField)
+
+def upload_process(obj, data):
+    print "T"
+    print data
+
+class Upload(wtforms.FileField):
+    def __init__(self, *args, **kwargs):
+        self.upload_directory = kwargs['upload_directory'] if kwargs.has_key('upload_directory') else '/tmp'
+        if not os.path.isdir(self.upload_directory):
+            os.mkdir(self.upload_directory)
+        kwargs.pop('upload_directory')
+        super(Upload, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, data):
+        uploaded_file = request.files[self.name]
+        file_path = os.path.join(self.upload_directory, uploaded_file.filename)
+        uploaded_file.save(file_path)
+        self.data =file_path
+
+File = makeOpt(Upload)
 Integer = makeOpt(wtforms.IntegerField)
 Float = makeOpt(wtforms.FloatField)
 Decimal = makeOpt(wtforms.DecimalField)
@@ -93,13 +114,9 @@ class wCmd(object):
             if hasattr(field, 'cmd_opt'):
                 cmd_parts += [field.cmd_opt, field.data]
             else:
-                if field.name == 'file':
-                    file = request.files[field.name]
-                    file.save(os.path.join('.', file.filename))
-                    cmd_parts += [file.filename]
-                else:
-                    cmd_parts += [field.data]
+                cmd_parts += [field.data]
 
+        print cmd_parts
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
 
