@@ -50,12 +50,6 @@ def makeOpt(field_type, process_formdata=None):
 
     return Opt
 
-Text = makeOpt(wtforms.TextField)
-
-def upload_process(obj, data):
-    print "T"
-    print data
-
 class Upload(wtforms.FileField):
     def __init__(self, *args, **kwargs):
         self.upload_directory = kwargs['upload_directory'] if kwargs.has_key('upload_directory') else '/tmp'
@@ -66,10 +60,14 @@ class Upload(wtforms.FileField):
 
     def process_formdata(self, data):
         uploaded_file = request.files[self.name]
-        file_path = os.path.join(self.upload_directory, uploaded_file.filename)
-        uploaded_file.save(file_path)
-        self.data =file_path
+        if uploaded_file.filename:
+            file_path = os.path.join(self.upload_directory, uploaded_file.filename)
+            uploaded_file.save(file_path)
+            self.data = file_path
+        else:
+            self.data = ''
 
+Text = makeOpt(wtforms.TextField)
 File = makeOpt(Upload)
 Integer = makeOpt(wtforms.IntegerField)
 Float = makeOpt(wtforms.FloatField)
@@ -115,8 +113,6 @@ class wCmd(object):
                 cmd_parts += [field.cmd_opt, field.data]
             else:
                 cmd_parts += [field.data]
-
-        print cmd_parts
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
 
