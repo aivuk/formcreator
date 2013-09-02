@@ -23,8 +23,6 @@ class MainApp(object):
 
         for c in cmds:
             for d in c.dirs:
-                print d
-                print "{}{}".format(SCRIPT_URL, d)
                 self.app.add_url_rule("{}{}/<path:filename>".format(SCRIPT_URL, d), "{}-{}".format(cmd.name, d), partial(self.serve_files, d), methods=['GET'])
 
     def run(self):
@@ -95,6 +93,7 @@ class Upload(wtforms.FileField):
         else:
             self.data = ''
 
+Boolean = makeOpt(wtforms.BooleanField)
 SelectFile = makeOpt(SelectFileField)
 Text = makeOpt(wtforms.TextField)
 File = makeOpt(Upload)
@@ -143,7 +142,10 @@ class wCmd(object):
         cmd_parts = [self.command]
         for field in self.form:
             if hasattr(field, 'cmd_opt'):
-                cmd_parts += [field.cmd_opt, field.data]
+                if field.data and str(type(field.data)) == "<type 'str'>":
+                    cmd_parts += [field.cmd_opt, field.data]
+                elif field.data:
+                    cmd_parts += [field.cmd_opt]
             else:
                 if field.data:
                     cmd_parts += [field.data]
