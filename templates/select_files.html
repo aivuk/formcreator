@@ -7,18 +7,21 @@
     function selectFile(filename, li_id) {
         if ($('input[name="{{field.name}}"]').val() != filename) {
             $('input[name="{{field.name}}"]').val(filename);
-            $('#select-file-{{field.name}} > li').removeClass('selected');
-            $('#' + li_id).toggleClass('selected');
+            $('#select-file-{{field.name}} > li').removeClass('label-info');
+            $('#' + li_id).toggleClass('label-info');
         } else {
             $('input[name="{{field.name}}"]').val('');
-            $('#select-file-{{field.name}} > li').removeClass('selected');
+            $('#select-file-{{field.name}} > li').removeClass('label-info');
         }
     }
 </script>
 <input type="hidden" name={{field.name}} value="">
 <ul id="select-file-{{field.name}}">
 {% for i,file in files %}
-<li id="{{field.name}}-file-{{i}}" onclick="javascript:selectFile('{{file}}', '{{field.name}}-file-{{i}}');">{{ file }}</li>
+{% if files_directory + "/" + file == field.data %}
+<script> $(function() {selectFile('{{file}}', '{{field.name}}-file-{{i}}');});</script>
+{% endif %}
+<li id="{{field.name}}-file-{{i}}" class="label" onclick="javascript:selectFile('{{file}}', '{{field.name}}-file-{{i}}');">{{ file }}</li>
 {% endfor %}
 </ul>
 

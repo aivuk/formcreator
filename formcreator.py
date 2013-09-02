@@ -66,7 +66,7 @@ class SelectFileField(wtforms.HiddenField):
             self.data = ''
 
     def __call__(self):
-        return render_template('select_files.html', field=self, files=enumerate(self.files))
+        return render_template('select_files.html', files_directory=self.files_directory, field=self, files=enumerate(self.files))
 
 class Upload(wtforms.FileField):
     def __init__(self, *args, **kwargs):
