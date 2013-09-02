@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from flask import Flask, request, jsonify, make_response, render_template, flash, redirect, url_for, session, escape, g
+from flask import Flask, request, jsonify, make_response, render_template, flash, redirect, url_for, session, escape, g, send_from_directory
 import wtforms
 from functools import partial
 import subprocess as sp
@@ -21,8 +21,17 @@ class MainApp(object):
         for i, cmd in enumerate(self.cmds.values()):
             self.app.add_url_rule(SCRIPT_URL + (cmd.name if i > 0 else ''), cmd.name, partial(self.form, cmd.name), methods=['GET', 'POST'])
 
+        for c in cmds:
+            for d in c.dirs:
+                print d
+                print "{}{}".format(SCRIPT_URL, d)
+                self.app.add_url_rule("{}{}/<path:filename>".format(SCRIPT_URL, d), "{}-{}".format(cmd.name, d), partial(self.serve_files, d), methods=['GET'])
+
     def run(self):
        self.app.run(debug=True,host='127.0.0.1')
+
+    def serve_files(self, dir, filename):
+        return send_from_directory(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '{}')).format(dir), filename)
 
     def form(self, cmd_name):
         f = self.cmds[cmd_name]
@@ -34,7 +43,7 @@ class MainApp(object):
             if f.form.validate():
                 f.run()
 
-        return render_template('form.html', form=f.list_form(), output=f.stdout, app=self)
+        return render_template('form.html', form=f.list_form(), output_type=f.output_type, output=f.stdout, app=self)
 
 def makeOpt(field_type, process_formdata=None):
     class Opt(object):
@@ -66,6 +75,7 @@ class SelectFileField(wtforms.HiddenField):
             self.data = ''
 
     def __call__(self):
+        self.files = os.listdir(self.files_directory)
         return render_template('select_files.html', files_directory=self.files_directory, field=self, files=enumerate(self.files))
 
 class Upload(wtforms.FileField):
@@ -94,7 +104,7 @@ Decimal = makeOpt(wtforms.DecimalField)
 
 class wCmd(object):
 
-    def __init__(self, command, name='', desc=''):
+    def __init__(self, command, name='', desc='', output_type='pre', dirs=[]):
         self.form = wtforms.form.BaseForm(())
         self.command = command
         if str(type(command)) == "<type 'function'>":
@@ -103,6 +113,8 @@ class wCmd(object):
             self.cmd_type = "program"
         self.name = name
         self.desc = desc
+        self.output_type = output_type
+        self.dirs = dirs
 
     def __add__(self, opt):
         field_position = len(self.form._fields) + 1
@@ -135,7 +147,6 @@ class wCmd(object):
             else:
                 if field.data:
                     cmd_parts += [field.data]
-        print cmd_parts
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
 

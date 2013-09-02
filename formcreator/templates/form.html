@@ -17,8 +17,12 @@
 <input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
 </form>
 
+{% if output_type == 'pre' %}
 <pre>
 {{ output }}
 </pre>
+{% else %}
+{{ output }}
+{% endif %}
 
 {% endblock %}

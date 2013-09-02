@@ -2,7 +2,7 @@
 
 from formcreator import *
 
-webCmd = wCmd("cat", desc="ls -l", name="ls")
+webCmd = wCmd("cat", desc="ls -l", name="ls", dirs=["updir"])
 
 webCmd += File( u'Filename or Path'
               , u'Name of file/directory to run ls -l'
@@ -17,7 +17,7 @@ webCmd += Text( u'Filename or Path'
 def duplica(num, exp=1):
     return 2*(num**exp)
 
-catCmd =  wCmd(duplica, desc="Show file contents", name="func")
+catCmd =  wCmd(duplica, desc="Show file contents", name="func", output_type="html")
 
 catCmd += Integer( u'Número'
                  , u'Número que será multiplicado')
