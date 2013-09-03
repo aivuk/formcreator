@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from flask import Flask, request, jsonify, make_response, render_template, flash, redirect, url_for, session, escape, g, send_from_directory
+from flask import Flask, request, jsonify, make_response, render_template, flash, redirect, url_for, session, escape, g, send_from_directory, Markup
 import wtforms
 from functools import partial
 from ordereddict import OrderedDict
+from markdown import markdown
 import subprocess as sp
 import os
 
@@ -27,12 +28,15 @@ class DirContents(object):
 
 class MainApp(object):
 
-    def __init__(self, name, cmds):
+    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port='5000'):
         self.name = name
         self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
-        self.app.config.from_pyfile('app.cfg')
+        self.config = os.path.abspath(config)
+        self.app.config.from_pyfile(self.config)
         self.dirs = []
+        self.host = host
+        self.port = port
 
         for i, cmd in enumerate(self.cmds.values()):
             self.app.add_url_rule(SCRIPT_URL + (cmd.name if i > 0 else ''), cmd.name, partial(self.form, cmd.name), methods=['GET', 'POST'])
@@ -43,7 +47,7 @@ class MainApp(object):
                 self.dirs.append(DirContents(d))
 
     def run(self):
-       self.app.run(debug=True,host='127.0.0.1')
+       self.app.run(debug=True, host=self.host)
 
     def serve_files(self, dir, filename):
         return send_from_directory(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '{}')).format(dir), filename)
@@ -58,7 +62,7 @@ class MainApp(object):
             if f.form.validate():
                 f.run()
 
-        return render_template('form.html', form=f.list_form(), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
+        return render_template('form.html', form=f.list_form(), desc=Markup(f.desc), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
 
 def makeOpt(field_type, process_formdata=None):
     class Opt(object):
@@ -118,7 +122,7 @@ Integer = makeOpt(wtforms.IntegerField)
 Float = makeOpt(wtforms.FloatField)
 Decimal = makeOpt(wtforms.DecimalField)
 
-class wCmd(object):
+class Form(object):
 
     def __init__(self, command, name='', desc='', output_type='pre', dirs=[]):
         self.form = wtforms.form.BaseForm(())
