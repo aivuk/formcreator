@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from flask import Flask, request, jsonify, make_response, render_template, flash, redirect, url_for, session, escape, g, send_from_directory
 import wtforms
 from functools import partial
+from ordereddict import OrderedDict
 import subprocess as sp
 import os
 
@@ -28,7 +29,7 @@ class MainApp(object):
 
     def __init__(self, name, cmds):
         self.name = name
-        self.cmds = {c.name: c for c in cmds}
+        self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
         self.app.config.from_pyfile('app.cfg')
         self.dirs = []
@@ -126,7 +127,13 @@ class wCmd(object):
             self.cmd_type = "function"
         else:
             self.cmd_type = "program"
-        self.name = name
+        if name != '':
+            self.name = name
+        elif self.cmd_type == 'function':
+            self.name = command.__name__
+        else:
+            self.name = command
+
         self.desc = desc
         self.output_type = output_type
         self.dirs = dirs

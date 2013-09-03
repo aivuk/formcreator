@@ -35,6 +35,8 @@ catCmd += Integer( u'Expoente'
 catCmd += Boolean( u'Eleva ao expoente'
                  , cmd_opt='to_exp')
 
+cowsay = wCmd("cowsay")
+cowsay += Text("Texto")
 
-test_app = MainApp('Testing', [webCmd, catCmd])
+test_app = MainApp('Testing', [webCmd, catCmd, cowsay])
 test_app.run()
