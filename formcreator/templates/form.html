@@ -16,7 +16,11 @@
 <p/>
 <input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
 </form>
-
+<p/>
+{% for d in dirs %}
+{{ d.html()|safe }}
+{% endfor %}
+<h2>Output</h2>
 {% if output_type == 'pre' %}
 <pre>
 {{ output }}

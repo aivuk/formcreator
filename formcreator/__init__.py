@@ -10,6 +10,20 @@ import os
 SCRIPT_URL = '/'
 SCRIPT_PATH = '.'
 
+class DirContents(object):
+    def __init__(self, dir, name=''):
+        self.dir = dir
+        if name != '':
+            self.name = name
+        else:
+            self.name = dir
+
+    def get_contents(self):
+        return os.listdir(self.dir)
+
+    def html(self):
+        return render_template('dir_contents.html', dir=self)
+
 class MainApp(object):
 
     def __init__(self, name, cmds):
@@ -17,6 +31,7 @@ class MainApp(object):
         self.cmds = {c.name: c for c in cmds}
         self.app = Flask(__name__)
         self.app.config.from_pyfile('app.cfg')
+        self.dirs = []
 
         for i, cmd in enumerate(self.cmds.values()):
             self.app.add_url_rule(SCRIPT_URL + (cmd.name if i > 0 else ''), cmd.name, partial(self.form, cmd.name), methods=['GET', 'POST'])
@@ -24,6 +39,7 @@ class MainApp(object):
         for c in cmds:
             for d in c.dirs:
                 self.app.add_url_rule("{}{}/<path:filename>".format(SCRIPT_URL, d), "{}-{}".format(cmd.name, d), partial(self.serve_files, d), methods=['GET'])
+                self.dirs.append(DirContents(d))
 
     def run(self):
        self.app.run(debug=True,host='127.0.0.1')
@@ -41,7 +57,7 @@ class MainApp(object):
             if f.form.validate():
                 f.run()
 
-        return render_template('form.html', form=f.list_form(), output_type=f.output_type, output=f.stdout, app=self)
+        return render_template('form.html', form=f.list_form(), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
 
 def makeOpt(field_type, process_formdata=None):
     class Opt(object):
