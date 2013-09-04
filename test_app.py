@@ -11,20 +11,30 @@ algum arquivo no sistema e exibir o conteúdo abaixo.
 
 """)
 
-webCmd = Form("cat", name="cat", desc=cat_desc, dirs=["updir"])
+cat = Form("cat", name="cat", desc=cat_desc, dirs=["updir"])
 
-webCmd += File( u'Filename or Path'
-              , u'Name of file/directory to run ls -l'
-              , upload_directory='updir')
+cat += File( u'Filename or Path'
+           , u'Name of file/directory to run ls -l'
+           , upload_directory='updir')
 
-webCmd += SelectFile( u'Filename or Path'
-                    , files_directory='updir')
+cat += SelectFile( u'Filename or Path'
+                 , files_directory='updir')
 
-webCmd += Text( u'Filename or Path'
-              , u'Name of file/directory to run ls -l')
+cat += Doc("""
+***Texto separador***
 
-webCmd += Boolean( u'Test boolean'
-                 , cmd_opt="-l")
+
+Pode conter imagens como:
+
+![Fractal](http://static.neatorama.com/images/2008-01/fractal-art-alfred-laing-spiral-fantasy.jpg)
+
+""")
+
+cat += Text( u'Filename or Path'
+           , u'Name of file/directory to run ls -l')
+
+cat += Boolean( u'Test boolean'
+              , cmd_opt="-l")
 
 def duplica(num, exp=1, to_exp=False):
     if to_exp:
@@ -32,20 +42,29 @@ def duplica(num, exp=1, to_exp=False):
     else:
         return 2*num
 
-catCmd =  Form(duplica, desc="Show file contents", name="func", output_type="html")
+dup =  Form(duplica, desc="Show file contents", name="func", output_type="html")
 
-catCmd += Integer( u'Número'
+dup += Integer( u'Número'
                  , u'Número que será multiplicado')
 
-catCmd += Integer( u'Expoente'
+dup += Integer( u'Expoente'
                  , u'Expoente do número'
                  , cmd_opt='exp')
 
-catCmd += Boolean( u'Eleva ao expoente'
+dup += Boolean( u'Eleva ao expoente'
                  , cmd_opt='to_exp')
 
 cowsay = Form("cowsay")
-cowsay += Text("Texto")
+cowsay += TextArea("Texto")
+cowsay += Doc("""
 
-test_app = MainApp('Testing', [webCmd, catCmd, cowsay])
+Olha a Vaca!
+===========
+Programa que desenha uma _vaca_.
+
+![Fractal](http://static.neatorama.com/images/2008-01/fractal-art-alfred-laing-spiral-fantasy.jpg)
+
+""")
+
+test_app = MainApp('Testing', [cat, dup, cowsay])
 test_app.run()
