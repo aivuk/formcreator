@@ -2,7 +2,7 @@ formcreator
 ===========
 
 _formcreator_ is a program that creates simple web forms for
-your programs or python functions, without you having to write
+your programs or python functions, without requiring to write
 any webprogramming code.
 
 Onde simple example, with you want to create a simple form for
