@@ -2,11 +2,11 @@ formcreator
 ===========
 
 _formcreator_ is a program that creates simple web forms for
-your programs or python functions, without requiring to write
-any webprogramming code.
+your programs or python functions, without requiring any 
+webprogramming code.
 
 An example, if you want to create a simple form for
-the _man_ program, you can just write the code:
+the _man_ program, you can write the code:
 
 ```python
 
@@ -20,7 +20,7 @@ app = MainApp("Man interface", [man])
 app.run()
 ```
 
-And you can run the program above with:
+And run the program above:
 
 ```
 $ python app.py
@@ -34,8 +34,7 @@ see the form:
 You can use other field types like __TextArea__, __File__ for file uploads, 
 __SelectFile__ for a widget where you can select a file from a directory,
 simple numerical types like __Integer__, __Decimal__ and __Float__. Is possible
-to insert any Markdown text between the fields of your form with the special 
-type __Doc__:
+to insert any Markdown text between your form fields with the type __Doc__:
 
 ```python
 
@@ -59,8 +58,7 @@ app = MainApp("Man interface", [man])
 app.run()
 ```
 
-A MainApp can have more than one form inside, you just need to pass the
-forms like:
+A MainApp can have more than one form inside, just pass the forms like:
 
 ```python
 app = MainApp("Example", [man, cowsay, convert])
@@ -85,8 +83,8 @@ app.run()
 
 When the form is for a function, all fields with _cmd_opt_ arguments will be passed
 like keywords arguments for the python function.
-If you want to see contents of one or more directories in the webinterface, 
-you just need to pass the _dirs_ argument to __Form__:
+If you want to see contents of one or more directories in the web interface, 
+just pass the _dirs_ argument to __Form__:
 
 ```python
 Form(f, dirs=["updir"])
@@ -96,10 +94,10 @@ And you will see this on the form page:
 
 ![Directory contents](http://i.imgur.com/KkPrU6d.png)
 
-This is usefull when the output of your function or programa is a file. In this case
-you can use that widget to download the new file created.
+This is usefull when the output of your function or program is in a file. In the 
+widget you can download any file created.
 
-You can see the more complex example [test_app.py](https://github.com/aivuk/formcreator/blob/master/test_app.py) in the repository.
+You can see a more complex example [test_app.py](https://github.com/aivuk/formcreator/blob/master/test_app.py) in the repository.
 
 TODO
 -----
