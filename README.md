@@ -5,7 +5,7 @@ _formcreator_ is a program that creates simple web forms for
 your programs or python functions, without requiring to write
 any webprogramming code.
 
-Onde simple example, with you want to create a simple form for
+An example, if you want to create a simple form for
 the _man_ program, you can just write the code:
 
 ```python
@@ -20,7 +20,7 @@ app = MainApp("Man interface", [man])
 app.run()
 ```
 
-You can run the program above with:
+And you can run the program above with:
 
 ```
 $ python app.py
