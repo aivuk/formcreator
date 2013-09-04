@@ -98,6 +98,8 @@ And you will see this on the form page:
 This is usefull when the output of your function or programa is a file. In this case
 you can use that widget to download the new file created.
 
+You can see the more complex example [test_app.py](https://github.com/aivuk/formcreator/blob/master/test_app.py) in the repository.
+
 TODO
 -----
 
