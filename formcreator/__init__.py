@@ -19,22 +19,32 @@ SCRIPT_PATH = '.'
 
 class MainApp(object):
 
-    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port='5000'):
+    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port='5000', script_url=SCRIPT_URL):
         self.name = name
         self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
         self.config = os.path.abspath(config)
+        # Not being used!
         self.app.config.from_pyfile(self.config)
+        # Directories with contents displayed in the page
         self.dirs = []
         self.host = host
         self.port = port
 
+        # Create the url_rules for the Forms
         for i, cmd in enumerate(self.cmds.values()):
-            self.app.add_url_rule(SCRIPT_URL + (cmd.name if i > 0 else ''), cmd.name, partial(self.form, cmd.name), methods=['GET', 'POST'])
+            self.app.add_url_rule( SCRIPT_URL + (cmd.name if i > 0 else '')
+                                 , cmd.name
+                                 , partial(self.form, cmd.name)
+                                 , methods=['GET', 'POST'])
 
+        # Create the url_rules for serving Form's files directories
         for c in cmds:
             for d in c.dirs:
-                self.app.add_url_rule("{}{}/<path:filename>".format(SCRIPT_URL, d), "{}-{}".format(cmd.name, d), partial(self.serve_files, d), methods=['GET'])
+                self.app.add_url_rule( "{}{}/<path:filename>".format(SCRIPT_URL, d)
+                                     , "{}-{}".format(cmd.name, d)
+                                     , partial(self.serve_files, d)
+                                     , methods=['GET'])
                 self.dirs.append(DirContents(d))
 
     def run(self):
@@ -53,7 +63,7 @@ class MainApp(object):
             if f.form.validate():
                 f.run()
 
-        return render_template('form.html', form=f.list_form(), desc=Markup(f.desc), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
+        return render_template('form.html', form=f.opts, desc=Markup(f.desc), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
 
 class Form(object):
 
@@ -61,10 +71,14 @@ class Form(object):
         self.form = wtforms.form.BaseForm(())
         self.command = command
         self.opts = []
+
         if str(type(command)) == "<type 'function'>":
             self.cmd_type = "function"
+            self.run = self.run_function
         else:
             self.cmd_type = "program"
+            self.run = self.run_cmd
+
         if name != '':
             self.name = name
         elif self.cmd_type == 'function':
@@ -95,11 +109,6 @@ class Form(object):
                 self.opts.append(opt)
         return self
 
-    def list_form(self):
-        fs = list(self.form)
-        fs.sort(key = lambda x: x.position)
-        return self.opts
-
     def process(self, form_data):
         self.form.process(form_data)
 
@@ -128,9 +137,3 @@ class Form(object):
                 args.append(field.data)
 
         self.stdout = self.command(*args, **kwargs)
-
-    def run(self):
-        if self.cmd_type == 'function':
-            self.run_function()
-        else:
-            self.run_cmd()

@@ -13,10 +13,9 @@
             {{ error }}
         {% endfor %}
 {% endfor %}
-<p/>
+<br></br>
 <input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
 </form>
-<p/>
 {% for d in dirs %}
 {{ d.html()|safe }}
 {% endfor %}
