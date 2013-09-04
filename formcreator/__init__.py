@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import subprocess as sp
 from functools import partial
+from operator import attrgetter
 import os
 
 from flask import Flask, request, render_template, send_from_directory, Markup
@@ -63,7 +64,7 @@ class MainApp(object):
             if f.form.validate():
                 f.run()
 
-        return render_template('form.html', form=f.opts, desc=Markup(f.desc), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
+        return render_template('form.html', form=f.fields_list(), desc=Markup(f.desc), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
 
 class Form(object):
 
@@ -90,6 +91,15 @@ class Form(object):
         self.output_type = output_type
         self.dirs = dirs
 
+    def fields_list(self):
+        fl = []
+        for o in self.opts:
+            if hasattr(o, "field"):
+                fl += [o.field]
+            else:
+                fl += [o]
+        return fl
+
     def __add__(self, opt):
         field_position = len(self.form._fields) + 1
         opt.name = 'arg-{}'.format(field_position)
@@ -104,7 +114,8 @@ class Form(object):
                 new_field.data = opt.default or ''
                 if hasattr(opt, "cmd_opt"):
                     new_field.cmd_opt = opt.cmd_opt
-                self.opts.append(new_field)
+                opt.field = new_field
+                self.opts.append(opt)
             else:
                 self.opts.append(opt)
         return self
@@ -114,15 +125,9 @@ class Form(object):
 
     def run_cmd(self):
         cmd_parts = [self.command]
-        for field in self.form:
-            if hasattr(field, 'cmd_opt'):
-                if field.data and str(type(field.data)) == "<type 'str'>":
-                    cmd_parts += [field.cmd_opt, field.data]
-                elif field.data:
-                    cmd_parts += [field.cmd_opt]
-            else:
-                if field.data:
-                    cmd_parts += [field.data]
+        for opt in self.opts:
+            if hasattr(opt, "field") and opt.field.data:
+                cmd_parts += opt.cmd_data()
         cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
         self.stdout = cmd[0].decode('utf8')
 

@@ -16,9 +16,21 @@
 <br></br>
 <input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
 </form>
-{% for d in dirs %}
-{{ d.html()|safe }}
-{% endfor %}
+
+{% if dirs %}
+<div id="show-dirs">
+    <ul>
+    {% for d in dirs %}
+    <li><a href="#dir-{{ d.name }}">{{ d.name }}</a></li>
+    {% endfor %}
+    </ul>
+    {% for d in dirs %}
+    {{ d.html()|safe }}
+    {% endfor %}
+</div>
+<script>$('#show-dirs').tabs();</script>
+{% endif %}
+
 <h2>Output</h2>
 {% if output_type == 'pre' %}
 <pre>

@@ -4,7 +4,7 @@ from flask import render_template, request
 
 __all__ = ["SelectFile", "Boolean", "Text", "TextArea", "File", "Integer", "Float", "Decimal"]
 
-def makeOpt(field_type, process_formdata=None):
+def makeOpt(field_type):
     class Opt(object):
 
         def __init__(self, label='', description='', name='', default='', cmd_opt=None, **kwargs):
@@ -13,8 +13,15 @@ def makeOpt(field_type, process_formdata=None):
             self.field = field_type(label=label, description=description, **kwargs)
             if cmd_opt:
                 self.cmd_opt = cmd_opt
-            if process_formdata:
-                self.field.process_formdata = process_formdata
+
+        def cmd_data(self):
+            if hasattr(self.field, "cmd_data"):
+                return self.field.cmd_data()
+            else:
+                if hasattr(self, 'cmd_opt'):
+                    return [self.cmd_opt, str(self.field.data)]
+                else:
+                    return [str(self.field.data)]
 
     return Opt
 
@@ -53,7 +60,15 @@ class Upload(wtforms.FileField):
         else:
             self.data = ''
 
-Boolean = makeOpt(wtforms.BooleanField)
+class BooleanField(wtforms.BooleanField):
+    def __init__(self, *args, **kwargs):
+        super(BooleanField, self).__init__(*args, **kwargs)
+
+    def cmd_data(self):
+        if self.data:
+            return [self.cmd_opt]
+
+Boolean = makeOpt(BooleanField)
 SelectFile = makeOpt(SelectFileField)
 Text = makeOpt(wtforms.TextField)
 TextArea =  makeOpt(wtforms.TextAreaField)

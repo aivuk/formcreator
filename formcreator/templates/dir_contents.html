@@ -1,5 +1,4 @@
-<div class="dirContents well">
-    <h2>{{ dir.name }}</h2>
+<div id="dir-{{ dir.name }}" class="dirContents">
     <ul>
     {% for file in dir.get_contents() %}
         <li><a href="{{ "{}/{}".format(dir.name, file) }}">{{ file }}</a></li>
