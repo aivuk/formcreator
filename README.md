@@ -26,15 +26,16 @@ And you can run the program above with:
 $ python app.py
 ```
 
-If you go to your browser at _http://localhost:5000_, you will
+If you go to your browser at _http://localhost:5000_ you will
 see the form:
 
 ![Imgur](http://i.imgur.com/CT6lZQp.png)
 
-You can use other fields types like __TextArea__, __File__ for file uploads, 
+You can use other field types like __TextArea__, __File__ for file uploads, 
 __SelectFile__ for a widget where you can select a file from a directory,
-simple numerical types like __Integer__, __Decimal__ and __Float__. You can
-insert Markdown text between the fields of your form with the special type __Doc__:
+simple numerical types like __Integer__, __Decimal__ and __Float__. Is possible
+to insert any Markdown text between the fields of your form with the special 
+type __Doc__:
 
 ```python
 
