@@ -65,7 +65,7 @@ app = MainApp("Example", [man, cowsay, convert])
 ```
 
 If the first argument to __Form__ is not a string and is a python function,
-the form created you be for this function:
+the form data will be used in this function:
 
 ```python
 from formcreator import *
@@ -81,7 +81,7 @@ app = MainApp("Function example", [simple])
 app.run()
 ```
 
-When the form is for a function, all fields with _cmd_opt_ arguments will be passed
+In this case, all fields with _cmd_opt_ arguments will be passed
 like keywords arguments for the python function.
 If you want to see contents of one or more directories in the web interface, 
 just pass the _dirs_ argument to __Form__:
@@ -104,6 +104,8 @@ TODO
 
 * User access control.
 * Save form sessions.
+* Tests!
+* Display image results.
 * Better widgets for file selection.
 * Other types of fields (Select, Checkbox, etc).
 * Handle cases when program do not terminate. 
