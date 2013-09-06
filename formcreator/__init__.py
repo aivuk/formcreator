@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import subprocess as sp
 from functools import partial
 from operator import attrgetter
+from collections import Callable
 import os
 
 from flask import Flask, request, render_template, send_from_directory, Markup
@@ -52,7 +53,8 @@ class MainApp(object):
        self.app.run(debug=True, host=self.host)
 
     def serve_files(self, dir, filename):
-        return send_from_directory(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '{}')).format(dir), filename)
+        file_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '{}')).format(dir)
+        return send_from_directory(file_path, filename)
 
     def form(self, cmd_name):
         f = self.cmds[cmd_name]
@@ -64,7 +66,13 @@ class MainApp(object):
             if f.form.validate():
                 f.run()
 
-        return render_template('form.html', form=f.fields_list(), desc=Markup(f.desc), dirs=self.dirs, output_type=f.output_type, output=f.stdout, app=self)
+        return render_template( 'form.html'
+                              , form=f.fields_list()
+                              , desc=Markup(f.desc)
+                              , dirs=self.dirs
+                              , output_type=f.output_type
+                              , output=f.stdout
+                              , app=self)
 
 class Form(object):
 
@@ -73,10 +81,10 @@ class Form(object):
         self.command = command
         self.opts = []
 
-        if str(type(command)) == "<type 'function'>":
+        if isinstance(command, Callable):
             self.cmd_type = "function"
             self.run = self.run_function
-        else:
+        elif isinstance(command, basestring):
             self.cmd_type = "program"
             self.run = self.run_cmd
 
@@ -94,6 +102,7 @@ class Form(object):
     def fields_list(self):
         fl = []
         for o in self.opts:
+            # Just wtform fields will have the field attribute
             if hasattr(o, "field"):
                 fl += [o.field]
             else:
