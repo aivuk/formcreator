@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import subprocess as sp
 from functools import partial
 from operator import attrgetter
-from collections import Callable
 import os
 
 from flask import Flask, request, render_template, send_from_directory, Markup
@@ -81,7 +80,7 @@ class Form(object):
         self.command = command
         self.opts = []
 
-        if isinstance(command, Callable):
+        if callable(command):
             self.cmd_type = "function"
             self.run = self.run_function
         elif isinstance(command, basestring):
