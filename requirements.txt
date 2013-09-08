@@ -1,4 +1,6 @@
 ordereddict
 flask
+flask-login
+flask-sqlalchemy
 wtforms
 markdown

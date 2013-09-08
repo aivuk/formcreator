@@ -4,12 +4,10 @@ from __future__ import unicode_literals
 
 import subprocess as sp
 from functools import partial
-from operator import attrgetter
 import sha
 import os
 
-from flask import Flask, request, render_template, send_from_directory, Markup, flash, redirect, url_for
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask import Flask, request, render_template, send_from_directory, Markup, flash, redirect
 from flask.ext.login import LoginManager, login_required, login_user, logout_user
 import wtforms
 from ordereddict import OrderedDict
@@ -101,7 +99,7 @@ class MainApp(object):
 
             return redirect("/login")
 
-        return render_template("login.html", form=login_form, app=self.app)
+        return render_template("login.html", form=login_form, app=self)
 
     def load_user(self, userid):
        return User.query.get(userid)
