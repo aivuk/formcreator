@@ -4,12 +4,17 @@
 
 {% block main %}
 
-<div id="login">
-    <form method="POST">
-        Username: <input type="text" name="username"/><br/>
-        Password: <input type="password" name="password"/><br/>
-        <input type="submit" class="btn" value="Log in"/>
-    </form>
-</div>
+<form action="/login" method="post">
+{% for field in form %}
+        {{ field.label }}
+        {{ field }}
+        {{ field.description}}
+        {% for error in field.errors %}
+            {{ error }}
+        {% endfor %}
+{% endfor %}
+<br/>
+<input type="submit" value="Log in">
+</form>
 
 {% endblock %}

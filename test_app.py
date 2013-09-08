@@ -62,5 +62,5 @@ convert += File("Image", upload_directory="images")
 convert += SelectFile("Or select an image below", files_directory="images")
 convert += Text("New image name")
 
-test_app = MainApp('Testing', [man, dup, cowsay, convert])
+test_app = MainApp('Testing', [man, dup, cowsay, convert], not_public=True)
 test_app.run()

@@ -5,22 +5,26 @@ from __future__ import unicode_literals
 import subprocess as sp
 from functools import partial
 from operator import attrgetter
+import sha
 import os
 
-from flask import Flask, request, render_template, send_from_directory, Markup
+from flask import Flask, request, render_template, send_from_directory, Markup, flash, redirect, url_for
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.login import LoginManager, login_required, login_user, logout_user
 import wtforms
 from ordereddict import OrderedDict
 from markdown import markdown
 
 from fields import *
 from blocks import *
+from models import db, User
 
 SCRIPT_URL = '/'
 SCRIPT_PATH = '.'
 
 class MainApp(object):
 
-    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port='5000', script_url=SCRIPT_URL):
+    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port='5000', script_url=SCRIPT_URL, not_public=False):
         self.name = name
         self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
@@ -32,11 +36,30 @@ class MainApp(object):
         self.host = host
         self.port = port
 
+        if not_public:
+            self.not_public = True
+            # Create de database
+            self.db = db
+            self.app.test_request_context().push()
+            self.db.init_app(self.app)
+            self.db.create_all()
+
+            # Create hte LoginManager
+            self.login_manager = LoginManager()
+            self.login_manager.init_app(self.app)
+            self.login_manager.login_view = "login"
+            self.login_manager.user_loader(self.load_user)
+
         # Create the url_rules for the Forms
         for i, cmd in enumerate(self.cmds.values()):
+            if not_public:
+                url_function = partial(login_required(self.form), cmd.name)
+            else:
+                url_function = partial(self.form, cmd.name)
+
             self.app.add_url_rule( SCRIPT_URL + (cmd.name if i > 0 else '')
                                  , cmd.name
-                                 , partial(self.form, cmd.name)
+                                 , url_function
                                  , methods=['GET', 'POST'])
 
         # Create the url_rules for serving Form's files directories
@@ -47,6 +70,41 @@ class MainApp(object):
                                      , partial(self.serve_files, d)
                                      , methods=['GET'])
                 self.dirs.append(DirContents(d))
+
+        if not_public:
+            self.app.add_url_rule("/login", "login", self.login, methods=['POST', 'GET'])
+            self.app.add_url_rule("/logout", "logout", self.logout, methods=['POST', 'GET'])
+
+    def logout(self):
+        logout_user()
+        return redirect("/")
+
+    def login(self):
+        login_form = wtforms.form.BaseForm(())
+        login_form['username'] = wtforms.TextField("Username")
+        login_form['password'] = wtforms.PasswordField("Password")
+        login_form['username'].data = ''
+
+        if request.method == 'POST':
+            login_form.process(request.form)
+            if login_form.validate():
+                # login and validate the user...
+                password = sha.new(login_form['password'].data).hexdigest()
+                u = User.query.filter(User.username == login_form['username'].data,
+                                      User.password == password).all()
+                if u:
+                    login_user(u[0])
+                    flash("Logged in successfully.")
+                    return redirect(request.args.get("next") or "/")
+                else:
+                    flash("Username or password incorrect, try again.")
+
+            return redirect("/login")
+
+        return render_template("login.html", form=login_form, app=self.app)
+
+    def load_user(self, userid):
+       return User.query.get(userid)
 
     def run(self):
        self.app.run(debug=True, host=self.host)
