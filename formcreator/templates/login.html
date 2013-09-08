@@ -3,7 +3,8 @@
 {% block title %}Login{% endblock %}
 
 {% block main %}
-
+<div class="row-fluid">
+    <div class="span2 offset4">
 <form action="/login" method="post">
 {% for field in form %}
         {{ field.label }}
@@ -14,7 +15,8 @@
         {% endfor %}
 {% endfor %}
 <br/>
-<input type="submit" value="Log in">
+<input class="btn btn-primary" type="submit" value="Log in">
 </form>
-
+    </div>
+</div>
 {% endblock %}

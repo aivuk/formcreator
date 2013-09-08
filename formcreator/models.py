@@ -8,11 +8,13 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(80))
     email = db.Column(db.String(120), unique=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, username, password, email):
+    def __init__(self, username, password, email='', is_admin=False):
         self.username = username
         self.password = sha.new(password).hexdigest()
         self.email = email
+        self.is_admin = is_admin
 
     def __repr__(self):
         return '<User %r>' % self.username

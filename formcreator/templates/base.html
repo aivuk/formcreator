@@ -43,15 +43,19 @@
 <body>
 
         {% with messages = get_flashed_messages() %}
-          {% if messages %}
+         {% if messages %}
+        <div class="row-fluid">
+            <div class="span4 offset4">
             {% for message in messages %}
                 <div class="alert alert-block alert-error fade in">
                     <a class="close" data-dismiss="alert" href="#">×</a>
                       {{ message }}
                 </div>
             {% endfor %}
+            </div>
+        </div>
           {% endif %}
-        {% endwith %}
+       {% endwith %}
 
     <div class="navbar navbar-fixed-top"> 
       <div class="navbar-inner"> 
@@ -84,7 +88,11 @@
         </header>
 
         <div id="main" role="main">
+            <div class="row-fluid">
+                <div class="span6 offset3">
             {% block main %}{% endblock %}
+                </div>
+            </div>
         </div>
 
         <footer>
