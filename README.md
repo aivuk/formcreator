@@ -8,13 +8,13 @@ webprogramming code.
 Install
 ===========
 
-Just install with:
+Just install with
 
 ```
 $ python setup.py install
 ```
  
-Or:
+or
 
 ```
 $ pip install formcreator
