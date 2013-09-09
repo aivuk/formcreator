@@ -5,6 +5,24 @@ _formcreator_ is a program that creates simple web forms for
 your programs or python functions, without requiring any 
 webprogramming code.
 
+Install
+===========
+
+Just install with
+
+```
+$ python setup.py install
+```
+ 
+or
+
+```
+$ pip install formcreator
+```
+
+How it works
+============
+
 An example, if you want to create a simple form for
 the _man_ program, you can write the code:
 
