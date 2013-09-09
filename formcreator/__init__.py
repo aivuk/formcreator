@@ -22,7 +22,7 @@ SCRIPT_PATH = '.'
 
 class MainApp(object):
 
-    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port='5000', script_url=SCRIPT_URL, not_public=False):
+    def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port=5000, script_url=SCRIPT_URL, not_public=False):
         self.name = name
         self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
