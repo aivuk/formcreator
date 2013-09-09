@@ -13,9 +13,9 @@ import wtforms
 from ordereddict import OrderedDict
 from markdown import markdown
 
-from fields import *
-from blocks import *
-from models import db, User
+from .fields import *
+from .blocks import *
+from .models import db, User
 
 SCRIPT_URL = '/'
 SCRIPT_PATH = '.'
