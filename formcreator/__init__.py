@@ -27,8 +27,7 @@ class MainApp(object):
         self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
         self.config = os.path.abspath(config)
-        # Not being used!
-        self.app.config.from_pyfile(self.config)
+        self.app.config.from_pyfile(self.config, silent=True)
         # Directories with contents displayed in the page
         self.dirs = []
         self.host = host
