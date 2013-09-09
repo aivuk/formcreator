@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='formcreator',
-      version='0.1.0',
+      version='0.1.1',
       description='Create web forms for command line programs or python functions',
       url='http://github.com/aivuk/formcreator',
       author='Edgar Z. Alvarenga',
