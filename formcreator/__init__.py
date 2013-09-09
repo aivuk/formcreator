@@ -174,8 +174,7 @@ class Form(object):
         field_position = len(self.form._fields) + 1
         opt.name = 'arg-{}'.format(field_position)
         if opt.name in self.form:
-            print ("Field name already exist")
-            raise
+            raise RuntimeError("Field name already exist")
         else:
             if hasattr(opt, 'field'):
                 self.form[opt.name] = opt.field
