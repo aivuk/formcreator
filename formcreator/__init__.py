@@ -20,6 +20,10 @@ from .models import db, User
 SCRIPT_URL = '/'
 SCRIPT_PATH = '.'
 
+class DefaultConfig(object):
+    SECRET_KEY = 'Isthisthereallife?Isthisjustfantasy?Caughtinalandslide'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/formcreator.db'
+
 class MainApp(object):
 
     def __init__(self, name, cmds, config='app.cfg', host='127.0.0.1', port=5000, script_url=SCRIPT_URL, not_public=False):
@@ -27,8 +31,8 @@ class MainApp(object):
         self.cmds = OrderedDict([(c.name, c) for c in cmds])
         self.app = Flask(__name__)
         self.config = os.path.abspath(config)
-        # Not being used!
-        self.app.config.from_pyfile(self.config)
+        self.app.config.from_object('formcreator.DefaultConfig')
+        self.app.config.from_pyfile(self.config, silent=True)
         # Directories with contents displayed in the page
         self.dirs = []
         self.host = host
