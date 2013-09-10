@@ -1,19 +1,4 @@
-#######################################
-########APP Settings ##########
-#######################################
-
 # enable debug mode.  Disable this in production!
 DEBUG = True
-
-# Secret key for app encryption.
-# Simple way to generate a random secret key:
-#
-#    python -c "print repr(__import__('os').urandom(40))"
 SQLALCHEMY_DATABASE_URI = 'sqlite:////home/walrus/formcreator/test.db'
 SECRET_KEY = 'longsecretkeykfdasferuiawohnjlkasdfjkl'
-TITLE = 'app'
-SUBTITLE = 'A Flask Template with Bootstrap 2.2'
-AUTHOR = 'Eric S. Bullington'
-AUTHOR_EMAIL = 'eric.s.bullington@gmail.com'
-KEYWORDS = 'python, Flask, template, Bootstrap, authorization'
-DESCRIPTION = 'A Flask template, as opposed to a plug-in, for easy bootstraping of Flask projects involving SQLAlchemy and Bootstrap'
