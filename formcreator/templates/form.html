@@ -4,7 +4,7 @@
 
 {% block main %}
 {{ desc }}
-<form class="cmd_form" method="POST" enctype="multipart/form-data">
+<form class="cmd_form{{' form-inline' if inline else ''}}" method="POST" enctype="multipart/form-data">
 {% for field in form %}
         {{ field.label }}
         {{ field }}

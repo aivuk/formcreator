@@ -56,7 +56,7 @@ And you can see here that you can use markdown text to create text content in yo
 """)
 cowsay += TextArea("Texto")
 
-convert  = Form("convert", dirs=["images"])
+convert  = Form("convert", dirs=["images"], inline=True)
 convert += Integer("Degrees", cmd_opt="-rotate")
 convert += File("Image", upload_directory="images")
 convert += SelectFile("Or select an image below", files_directory="images")

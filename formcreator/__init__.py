@@ -137,14 +137,16 @@ class MainApp(object):
                               , dirs=self.dirs
                               , output_type=f.output_type
                               , output=f.stdout
+                              , inline=f.inline
                               , app=self)
 
 class Form(object):
 
-    def __init__(self, command, name='', desc='', output_type='pre', dirs=[]):
+    def __init__(self, command, name='', desc='', output_type='pre', dirs=[], inline=False):
         self.form = wtforms.form.BaseForm(())
         self.command = command
         self.opts = []
+        self.inline = inline
 
         if callable(command):
             self.cmd_type = "function"
