@@ -203,7 +203,11 @@ class Form(object):
         for opt in self.opts:
             if hasattr(opt, "field") and opt.field.data:
                 cmd_parts += opt.cmd_data()
-        cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
+        try:
+            cmd = sp.Popen(cmd_parts, stdout=sp.PIPE, stderr=sp.STDOUT).communicate()
+        except OSError:
+            self.stdout = "Command '{}' not found".format(cmd_parts[0])
+            return
         self.stdout = cmd[0].decode('utf8')
 
     def run_function(self):

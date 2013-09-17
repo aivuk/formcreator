@@ -13,6 +13,9 @@ class DirContents(object):
             self.name = dir
 
     def get_contents(self):
+        if not os.path.isdir(self.dir):
+            os.mkdir(self.dir)
+
         return os.listdir(self.dir)
 
     def html(self):
