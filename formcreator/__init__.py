@@ -45,7 +45,7 @@ class MainApp(object):
             self.app.test_request_context().push()
             self.db.init_app(self.app)
             self.db.create_all()
-            # Create admin user with doesn't exist
+            # Create admin user if doesn't exist
             admin_user = User.query.get(1)
             if not admin_user:
                 admin_user = User("admin", "admin", is_admin=True)
