@@ -11,3 +11,6 @@
 build/
 
 app.cfg
+
+*swp
+*swo

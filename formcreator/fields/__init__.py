@@ -2,7 +2,7 @@ import os
 import wtforms
 from flask import render_template, request
 
-__all__ = ["SelectFile", "Boolean", "Text", "TextArea", "File", "Integer", "Float", "Decimal"]
+__all__ = ["SelectFile", "Boolean", "Radio", "Text", "TextArea", "File", "Integer", "Float", "Decimal"]
 
 def makeOpt(field_type):
     class Opt(object):
@@ -76,3 +76,4 @@ File = makeOpt(Upload)
 Integer = makeOpt(wtforms.IntegerField)
 Float = makeOpt(wtforms.FloatField)
 Decimal = makeOpt(wtforms.DecimalField)
+Radio = makeOpt(wtforms.RadioField)

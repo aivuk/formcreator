@@ -17,6 +17,7 @@
 <input class="btn btn-primary btn-large" type="submit" name="submit_button" value="Run">
 </form>
 
+<!--
 {% if dirs %}
 <div id="show-dirs">
     <ul>
@@ -30,6 +31,7 @@
 </div>
 <script>$('#show-dirs').tabs();</script>
 {% endif %}
+-->
 
 <h2>Output</h2>
 {% if output_type == 'pre' %}
@@ -37,7 +39,7 @@
 {{ output }}
 </pre>
 {% else %}
-{{ output }}
+{{ output|safe }}
 {% endif %}
 
 {% endblock %}

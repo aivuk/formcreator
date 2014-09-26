@@ -118,7 +118,7 @@ class MainApp(object):
        self.app.run(debug=True, host=self.host)
 
     def serve_files(self, dir, filename):
-        file_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', '{}')).format(dir)
+        file_path = os.path.abspath(os.path.join(os.getcwd(), '{}')).format(dir)
         return send_from_directory(file_path, filename)
 
     def form(self, cmd_name):
