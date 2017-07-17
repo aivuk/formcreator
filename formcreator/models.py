@@ -1,4 +1,4 @@
-import sha
+import hashlib
 from flask.ext.sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -12,7 +12,7 @@ class User(db.Model):
 
     def __init__(self, username, password, email='', is_admin=False):
         self.username = username
-        self.password = sha.new(password).hexdigest()
+        self.password = hashlib.sha256(password.encode('utf-8')).hexdigest()
         self.email = email
         self.is_admin = is_admin
 

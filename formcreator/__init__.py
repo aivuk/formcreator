@@ -4,13 +4,13 @@ from __future__ import unicode_literals
 
 import subprocess as sp
 from functools import partial
-import sha
+import hashlib
 import os
 
 from flask import Flask, request, render_template, send_from_directory, Markup, flash, redirect
 from flask.ext.login import LoginManager, login_required, login_user, logout_user
 import wtforms
-from ordereddict import OrderedDict
+from collections import OrderedDict
 from markdown import markdown
 
 from .fields import *
@@ -97,7 +97,7 @@ class MainApp(object):
             login_form.process(request.form)
             if login_form.validate():
                 # login and validate the user...
-                password = sha.new(login_form['password'].data).hexdigest()
+                password = hashlib.sha256(login_form['password'].data.encode('utf8')).hexdigest()
                 u = User.query.filter(User.username == login_form['username'].data,
                                       User.password == password).all()
                 if u:
@@ -114,8 +114,8 @@ class MainApp(object):
     def load_user(self, userid):
        return User.query.get(userid)
 
-    def run(self):
-       self.app.run(debug=True, host=self.host)
+    def run(self, *args, **kwargs):
+       self.app.run(debug=True, *args, **kwargs)
 
     def serve_files(self, dir, filename):
         file_path = os.path.abspath(os.path.join(os.getcwd(), '{}')).format(dir)
@@ -151,7 +151,7 @@ class Form(object):
         if callable(command):
             self.cmd_type = "function"
             self.run = self.run_function
-        elif isinstance(command, basestring):
+        elif type(command) is str:
             self.cmd_type = "program"
             self.run = self.run_cmd
 
