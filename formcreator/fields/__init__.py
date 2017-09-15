@@ -45,7 +45,7 @@ class SelectFileField(wtforms.HiddenField):
 
 class Upload(wtforms.FileField):
     def __init__(self, *args, **kwargs):
-        self.upload_directory = kwargs['upload_directory'] if kwargs.has_key('upload_directory') else '/tmp'
+        self.upload_directory = kwargs['upload_directory'] if 'upload_directory' in kwargs else '/tmp'
         if not os.path.isdir(self.upload_directory):
             os.mkdir(self.upload_directory)
         kwargs.pop('upload_directory')
