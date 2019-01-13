@@ -8,7 +8,7 @@ import hashlib
 import os
 
 from flask import Flask, request, render_template, send_from_directory, Markup, flash, redirect
-from flask.ext.login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, login_user, logout_user
 import wtforms
 from collections import OrderedDict
 from markdown import markdown
