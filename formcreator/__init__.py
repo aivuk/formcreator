@@ -39,18 +39,7 @@ class MainApp(object):
         self.port = port
 
         if not_public:
-            self.not_public = True
-            # Create de database
-            self.db = db
-            self.app.test_request_context().push()
-            self.db.init_app(self.app)
-            self.db.create_all()
-            # Create admin user if doesn't exist
-            admin_user = User.query.get(1)
-            if not admin_user:
-                admin_user = User("admin", "admin", is_admin=True)
-                self.db.session.add(admin_user)
-                self.db.session.commit()
+            self.init_user_mgmt()
 
             # Create hte LoginManager
             self.login_manager = LoginManager()
@@ -83,11 +72,45 @@ class MainApp(object):
             self.app.add_url_rule("/login", "login", self.login, methods=['POST', 'GET'])
             self.app.add_url_rule("/logout", "logout", self.logout, methods=['POST', 'GET'])
 
+    def init_user_mgmt(self):
+        """This initializes the default user management method.
+        
+        To implement your own user management, you need to do the following:
+        
+        1. Implement a flask-compatible User class:
+            - see https://flask-login.readthedocs.io/en/latest/#your-user-class
+        2. Override the following MainApp methods:
+          1. init_user_mgmt()  -- This hook is invoked whenever not_public == True
+          2. load_user()       -- Must return a User instance based on id (per Flask)
+          3. do_user_login()   -- Must return a User instance based on login/password
+        
+        """
+        self.not_public = True
+        # Create de database
+        self.db = db
+        self.app.test_request_context().push()
+        self.db.init_app(self.app)
+        self.db.create_all()
+        # Create admin user if doesn't exist
+        admin_user = User.query.get(1)
+        if not admin_user:
+            admin_user = User("admin", "admin", is_admin=True)
+            self.db.session.add(admin_user)
+            self.db.session.commit()
+        
     def logout(self):
         logout_user()
         return redirect("/")
-
+    
+    def do_user_login(self, login, password):
+        """This is the default user login implementation. Override if doing your own."""
+        password = hashlib.sha256(password.encode('utf8')).hexdigest()
+        u = User.query.filter(User.username == login,
+                              User.password == password).one()
+        return u
+    
     def login(self):
+
         login_form = wtforms.form.BaseForm(())
         login_form['username'] = wtforms.TextField("Username")
         login_form['password'] = wtforms.PasswordField("Password")
@@ -97,11 +120,11 @@ class MainApp(object):
             login_form.process(request.form)
             if login_form.validate():
                 # login and validate the user...
-                password = hashlib.sha256(login_form['password'].data.encode('utf8')).hexdigest()
-                u = User.query.filter(User.username == login_form['username'].data,
-                                      User.password == password).all()
+                login = login_form['username'].data
+                password = login_form['password'].data
+                u = self.do_user_login(login, password)
                 if u:
-                    login_user(u[0])
+                    login_user(u)
                     flash("Logged in successfully.")
                     return redirect(request.args.get("next") or "/")
                 else:
@@ -112,7 +135,8 @@ class MainApp(object):
         return render_template("login.html", form=login_form, app=self)
 
     def load_user(self, userid):
-       return User.query.get(userid)
+        user = User.query.get(userid)
+        return user
 
     def run(self, *args, **kwargs):
        self.app.run(debug=True, *args, **kwargs)
