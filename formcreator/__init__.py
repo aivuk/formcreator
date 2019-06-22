@@ -74,16 +74,16 @@ class MainApp(object):
 
     def init_user_mgmt(self):
         """This initializes the default user management method.
-        
+
         To implement your own user management, you need to do the following:
-        
+
         1. Implement a flask-compatible User class:
             - see https://flask-login.readthedocs.io/en/latest/#your-user-class
         2. Override the following MainApp methods:
           1. init_user_mgmt()  -- This hook is invoked whenever not_public == True
           2. load_user()       -- Must return a User instance based on id (per Flask)
           3. do_user_login()   -- Must return a User instance based on login/password
-        
+
         """
         self.not_public = True
         # Create de database
@@ -97,18 +97,18 @@ class MainApp(object):
             admin_user = User("admin", "admin", is_admin=True)
             self.db.session.add(admin_user)
             self.db.session.commit()
-        
+
     def logout(self):
         logout_user()
         return redirect("/")
-    
+
     def do_user_login(self, login, password):
         """This is the default user login implementation. Override if doing your own."""
         password = hashlib.sha256(password.encode('utf8')).hexdigest()
         u = User.query.filter(User.username == login,
                               User.password == password).one()
         return u
-    
+
     def login(self):
 
         login_form = wtforms.form.BaseForm(())
@@ -122,12 +122,12 @@ class MainApp(object):
                 # login and validate the user...
                 login = login_form['username'].data
                 password = login_form['password'].data
-                u = self.do_user_login(login, password)
-                if u:
+                try:
+                    u = self.do_user_login(login, password)
                     login_user(u)
                     flash("Logged in successfully.")
                     return redirect(request.args.get("next") or "/")
-                else:
+                except:
                     flash("Username or password incorrect, try again.")
 
             return redirect("/login")
